@@ -1,0 +1,48 @@
+{
+  "name": "minesweeper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A compact, classic Minesweeper desktop game",
+  "author": "Deaquans",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test desktop/app.test.cjs",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^43.0.0",
+    "electron-builder": "^26.0.0",
+    "playwright": "^1.58.0"
+  },
+  "build": {
+    "appId": "com.deaquans.minesweeper",
+    "productName": "Minesweeper",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "files": [
+      "desktop/main.cjs",
+      "desktop/preload.cjs",
+      "index.html",
+      "style.css",
+      "game.js"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "Deaquans",
+      "repo": "bombsweeper"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Minesweeper"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.games"
+    }
+  }
+}

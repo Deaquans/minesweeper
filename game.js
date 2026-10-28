@@ -25,6 +25,18 @@
   const customWidthEl = document.getElementById("custom-width");
   const customHeightEl = document.getElementById("custom-height");
   const customMinesEl = document.getElementById("custom-mines");
+  const native = window.nativeWindow;
+
+  if (native) {
+    document.body.classList.add("native-app");
+    maximizeBtn.disabled = true;
+    maximizeBtn.title = "Maximize unavailable";
+    maximizeBtn.setAttribute("aria-label", maximizeBtn.title);
+    new ResizeObserver(() => {
+      const bounds = windowEl.getBoundingClientRect();
+      native.resize(Math.ceil(bounds.width), Math.ceil(bounds.height));
+    }).observe(windowEl);
+  }
 
   let config, cells, state, flagsPlaced, revealedCount, timerId, seconds;
   let customConfig = { rows: 9, cols: 9, mines: 10 };
@@ -97,6 +109,12 @@
 
   // Size cells so the whole board fits: normal windows cap at 28px, maximized ones grow to fill the screen.
   function fitBoard() {
+    if (native) {
+      const { width, height } = native.workArea;
+      const size = Math.floor(Math.min(28, (width - 38) / config.cols, (height - 220) / config.rows));
+      document.documentElement.style.setProperty("--cell-size", `${Math.max(16, size)}px`);
+      return;
+    }
     const maximized = windowEl.classList.contains("maximized");
     const byWidth = (window.innerWidth - (maximized ? 50 : 80)) / config.cols;
     const byHeight = (window.innerHeight - 215) / config.rows;
@@ -336,10 +354,6 @@
   document.getElementById("custom-x").addEventListener("click", hideCustomDialog);
 
   // ---- Window controls ----
-  // When wrapped as a desktop app, expose `window.nativeWindow = { close, minimize, toggleMaximize }`
-  // (e.g. from an Electron preload or Tauri) and these buttons will drive the real window instead.
-  const native = window.nativeWindow;
-
   function closeWindow() {
     if (native?.close) return native.close();
     hideHelp();
@@ -367,7 +381,7 @@
   }
 
   function toggleMaximize() {
-    if (native?.toggleMaximize) return native.toggleMaximize();
+    if (native) return;
     const on = windowEl.classList.toggle("maximized");
     maximizeBtn.title = on ? "Restore" : "Maximize";
     maximizeBtn.setAttribute("aria-label", maximizeBtn.title);

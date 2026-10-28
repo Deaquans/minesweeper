@@ -89,6 +89,33 @@ body[data-theme="dark"] .n8 { color: #a3aab4; }
   padding: 3px;
 }
 
+body.native-app {
+  background: var(--face);
+}
+
+.native-app .desktop {
+  min-height: 0;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.native-app .window {
+  box-shadow: inset -1px -1px var(--shadow), inset 1px 1px #dfdfdf;
+}
+
+.native-app #window > .title-bar {
+  -webkit-app-region: drag;
+}
+
+.native-app .title-buttons {
+  -webkit-app-region: no-drag;
+}
+
+.title-buttons button:disabled {
+  color: var(--shadow);
+  cursor: default;
+}
+
 .title-bar {
   display: flex;
   justify-content: space-between;
