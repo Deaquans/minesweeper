@@ -30,7 +30,7 @@
     "publish": {
       "provider": "github",
       "owner": "Deaquans",
-      "repo": "bombsweeper"
+      "repo": "minesweeper"
     },
     "win": {
       "target": "nsis"

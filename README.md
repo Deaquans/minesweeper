@@ -5,7 +5,7 @@ Electron, HTML, CSS and JavaScript.
 
 ## Download
 
-Installers are published to [GitHub Releases](https://github.com/Deaquans/bombsweeper/releases)
+Installers are published to [GitHub Releases](https://github.com/Deaquans/minesweeper/releases)
 when a version tag is pushed:
 
 - **Windows:** download the `win-x64.exe` installer.
