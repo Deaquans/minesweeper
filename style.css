@@ -1,0 +1,361 @@
+:root {
+  --face: #c0c0c0;
+  --light: #ffffff;
+  --shadow: #808080;
+  --dark: #000000;
+  --cell-size: 28px;
+  --bevel: 3px;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  overflow: auto;
+  background: #008080;
+  font-family: Tahoma, Geneva, "MS Sans Serif", Verdana, sans-serif;
+  font-size: 13px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.desktop {
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  justify-content: safe center;
+  align-items: flex-start;
+  padding: 24px 12px 60px;
+}
+
+.window {
+  position: relative;
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--light) var(--dark) var(--dark) var(--light);
+  box-shadow: inset -1px -1px var(--shadow), inset 1px 1px #dfdfdf, 4px 4px 0 rgba(0, 0, 0, 0.35);
+  padding: 3px;
+}
+
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #fff;
+  font-weight: bold;
+  padding: 3px 4px 3px 6px;
+}
+
+.title-buttons { display: flex; gap: 2px; }
+.title-buttons button {
+  width: 22px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--face);
+  color: #000;
+  font: bold 11px Tahoma, Geneva, sans-serif;
+  line-height: 1;
+  border: 2px solid;
+  border-color: var(--light) var(--dark) var(--dark) var(--light);
+  border-radius: 0;
+  cursor: pointer;
+}
+.title-buttons svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+  shape-rendering: crispEdges;
+}
+.title-buttons .icon-restore,
+.window.maximized .title-buttons .icon-max { display: none; }
+.window.maximized .title-buttons .icon-restore { display: block; }
+.title-buttons button:active {
+  border-color: var(--dark) var(--light) var(--light) var(--dark);
+  padding: 1px 0 0 1px;
+}
+#btn-close { margin-left: 2px; }
+
+/* Maximized window fills the whole page */
+.window.maximized {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset -1px -1px var(--shadow), inset 1px 1px #dfdfdf;
+  z-index: 10;
+}
+.window.maximized .game {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.menu-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+}
+
+select {
+  font: inherit;
+  background: #fff;
+  border: 2px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0;
+  padding: 2px 4px;
+}
+
+.bevel-btn {
+  font: inherit;
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--light) var(--dark) var(--dark) var(--light);
+  box-shadow: inset -1px -1px var(--shadow);
+  border-radius: 0;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.bevel-btn:active,
+.bevel-btn[aria-pressed="true"] {
+  border-color: var(--dark) var(--light) var(--light) var(--dark);
+  box-shadow: inset 1px 1px var(--shadow);
+  padding: 4px 9px 2px 11px;
+}
+
+.game {
+  padding: 8px;
+  border: var(--bevel) solid;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 6px;
+  margin-bottom: 8px;
+  border: 2px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+/* 7-segment LED counter */
+.counter {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: #000;
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.digit {
+  position: relative;
+  width: 13px;
+  height: 23px;
+}
+
+.seg {
+  position: absolute;
+  background: #2b0000;
+}
+
+.seg.on { background: #ff0000; }
+
+.seg.a, .seg.d, .seg.g {
+  left: 1px;
+  width: 11px;
+  height: 3px;
+  clip-path: polygon(0 50%, 2px 0, calc(100% - 2px) 0, 100% 50%, calc(100% - 2px) 100%, 2px 100%);
+}
+.seg.a { top: 0; clip-path: polygon(0 0, 100% 0, calc(100% - 3px) 100%, 3px 100%); }
+.seg.g { top: 10px; }
+.seg.d { bottom: 0; clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 100%, 0 100%); }
+
+.seg.b, .seg.c, .seg.e, .seg.f {
+  width: 3px;
+  height: 10px;
+}
+.seg.f, .seg.e { left: 0; }
+.seg.b, .seg.c { right: 0; }
+.seg.f, .seg.b { top: 1px; }
+.seg.e, .seg.c { bottom: 1px; }
+.seg.f { clip-path: polygon(0 0, 100% 3px, 100% calc(100% - 2px), 0 100%); }
+.seg.b { clip-path: polygon(0 3px, 100% 0, 100% 100%, 0 calc(100% - 2px)); }
+.seg.e { clip-path: polygon(0 0, 100% 2px, 100% calc(100% - 3px), 0 100%); }
+.seg.c { clip-path: polygon(0 2px, 100% 0, 100% 100%, 0 calc(100% - 3px)); }
+
+.reset {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+  background: var(--face);
+  border: 3px solid;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+  outline: 1px solid var(--shadow);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.reset:active {
+  border-width: 1px;
+  border-color: var(--shadow);
+  padding-top: 2px;
+}
+
+.board {
+  display: grid;
+  border: var(--bevel) solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  width: max-content;
+  margin: 0 auto;
+}
+
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 900;
+  font-size: calc(var(--cell-size) * 0.6);
+  line-height: 1;
+  background: var(--face);
+  border: var(--bevel) solid;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.cell:not(.revealed):active {
+  border: 1px solid var(--shadow);
+  border-width: 1px 0 0 1px;
+}
+
+.cell.revealed {
+  border: 1px solid var(--shadow);
+  border-width: 1px 0 0 1px;
+  cursor: default;
+}
+
+.cell.revealed.has-number { cursor: pointer; }
+.cell.mine.exploded { background: #ff0000; }
+.cell.wrong-flag { font-size: calc(var(--cell-size) * 0.5); }
+
+.n1 { color: #0000ff; }
+.n2 { color: #008000; }
+.n3 { color: #ff0000; }
+.n4 { color: #000080; }
+.n5 { color: #800000; }
+.n6 { color: #008080; }
+.n7 { color: #000000; }
+.n8 { color: #808080; }
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.message {
+  flex: 1;
+  min-height: 22px;
+  margin: 0;
+  padding: 3px 6px;
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.bevel-btn.small { padding: 2px 8px; }
+.bevel-btn.small:active { padding: 3px 7px 1px 9px; }
+
+/* Help dialog */
+.dialog-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 20;
+}
+
+.dialog {
+  width: min(340px, calc(100% - 16px));
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--light) var(--dark) var(--dark) var(--light);
+  box-shadow: inset -1px -1px var(--shadow), 4px 4px 0 rgba(0, 0, 0, 0.35);
+  padding: 3px;
+}
+
+.dialog-body { padding: 10px 12px; line-height: 1.45; }
+.dialog-body p { margin: 0 0 8px; }
+.dialog-body ul { margin: 0 0 12px; padding-left: 18px; }
+.dialog-body li { margin-bottom: 4px; }
+.dialog-actions { display: flex; justify-content: center; }
+.dialog-actions .bevel-btn { min-width: 75px; }
+
+/* Desktop icon shown when the window is closed */
+.desktop-icon {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: none;
+  border: 1px dotted transparent;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+.desktop-icon:focus { outline: none; border-color: #fff; }
+.desktop-icon:focus .desktop-icon-label { background: #000080; }
+.desktop-icon-img { font-size: 34px; line-height: 1; }
+.desktop-icon-label { padding: 1px 3px; text-shadow: 1px 1px 0 #004040; }
+
+/* Taskbar shown when the window is minimized */
+.taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  background: var(--face);
+  border-top: 2px solid var(--light);
+  box-shadow: 0 -1px 0 #dfdfdf;
+  z-index: 30;
+}
+.taskbar-item { min-width: 160px; text-align: left; font-weight: bold; }
+
+kbd {
+  background: var(--face);
+  color: #000;
+  border: 1px solid;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+  padding: 0 4px;
+  font-size: 11px;
+  text-shadow: none;
+}
