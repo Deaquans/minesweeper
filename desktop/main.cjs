@@ -10,12 +10,16 @@ function isGameSender(event) {
     event.senderFrame?.url === gameURL;
 }
 
+function getWorkArea() {
+  return screen.getDisplayMatching(gameWindow.getBounds()).workAreaSize;
+}
+
 ipcMain.on("window:work-area", (event) => {
   if (!isGameSender(event)) {
     event.returnValue = null;
     return;
   }
-  const { width, height } = screen.getDisplayMatching(gameWindow.getBounds()).workAreaSize;
+  const { width, height } = getWorkArea();
   event.returnValue = { width, height };
 });
 
@@ -33,7 +37,7 @@ ipcMain.on("window:resize", (event, width, height) => {
     console.error("Rejected invalid game window dimensions:", width, height);
     return;
   }
-  const area = screen.getDisplayMatching(gameWindow.getBounds()).workAreaSize;
+  const area = getWorkArea();
   const size = [Math.min(width, area.width), Math.min(height, area.height)];
   const current = gameWindow.getContentSize();
   if (size[0] !== current[0] || size[1] !== current[1]) {

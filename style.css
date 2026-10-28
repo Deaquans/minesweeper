@@ -49,16 +49,6 @@ body[data-theme="dark"] input {
   background: #20252c;
 }
 
-body[data-theme="dark"] .game {
-  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
-}
-
-body[data-theme="dark"] .board,
-body[data-theme="dark"] .status-bar,
-body[data-theme="dark"] .message {
-  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
-}
-
 body[data-theme="dark"] .n1 { color: #78a9ff; }
 body[data-theme="dark"] .n2 { color: #7ee787; }
 body[data-theme="dark"] .n3 { color: #ff7b72; }
@@ -320,14 +310,13 @@ select {
   cursor: pointer;
 }
 
-.cell:not(.revealed):active {
+.cell:not(.revealed):active,
+.cell.revealed {
   border: 1px solid var(--shadow);
   border-width: 1px 0 0 1px;
 }
 
 .cell.revealed {
-  border: 1px solid var(--shadow);
-  border-width: 1px 0 0 1px;
   cursor: default;
 }
 

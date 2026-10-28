@@ -7,9 +7,10 @@ const { _electron: electron } = require("playwright");
 test("desktop window fits the game and native controls work", { timeout: 60000 }, async (t) => {
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
+  const executablePath = process.env.MINESWEEPER_EXECUTABLE;
   const app = await electron.launch({
-    executablePath: process.env.MINESWEEPER_EXECUTABLE,
-    args: process.env.MINESWEEPER_EXECUTABLE ? [] : [path.join(__dirname, "..")],
+    executablePath,
+    args: executablePath ? [] : [path.join(__dirname, "..")],
     env
   });
   t.after(() => app.close());
@@ -66,9 +67,17 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   assert.equal(await page.locator(".cell").count(), 480);
   await assertFits();
   await page.locator("#difficulty").selectOption("custom");
+  await page.locator("#custom-cancel").click();
+  assert.equal(await page.locator("#difficulty").inputValue(), "expert");
+  assert.equal(await page.locator(".cell").count(), 480);
+  await page.locator("#difficulty").selectOption("custom");
   await page.locator("#custom-width").fill("5");
   await page.locator("#custom-height").fill("5");
   await page.locator("#custom-mines").fill("5");
+  await page.locator("#custom-width").fill("4");
+  assert.equal(await page.locator("#custom-form").evaluate((form) => form.checkValidity()), false);
+  await page.locator("#custom-width").fill("5");
+  assert.equal(await page.locator("#custom-form").evaluate((form) => form.checkValidity()), true);
   await page.locator("#custom-form button[type=submit]").click();
   assert.equal(await page.locator(".cell").count(), 25);
   await assertFits();
@@ -80,10 +89,36 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   await first.click();
   assert.equal(await first.evaluate((el) => el.classList.contains("revealed")), true);
   await page.locator("#btn-theme").click();
+  assert.equal(await page.locator("body").getAttribute("data-theme"), "dark");
+  assert.match(await page.locator("#btn-theme").evaluate((el) =>
+    getComputedStyle(el).boxShadow), /-1px -1px/);
+  await page.locator("#btn-theme").click();
+  assert.equal(await page.locator("body").getAttribute("data-theme"), "light");
   await assertFits();
   await page.keyboard.press("h");
   assert.equal(await page.locator("#help-overlay").isVisible(), true);
   await page.locator("#help-ok").click();
+
+  await page.locator("#reset").click();
+  await page.evaluate(() => {
+    const random = Math.random;
+    try {
+      Math.random = () => 0;
+      document.querySelector(".cell").click();
+    } finally {
+      Math.random = random;
+    }
+    const mines = new Set([2, 3, 4, 7, 8]);
+    document.querySelectorAll(".cell").forEach((cell, index) => {
+      if (!mines.has(index)) cell.click();
+    });
+  });
+  assert.equal(await page.locator("#reset").textContent(), "😎");
+  assert.match(await page.locator("#message").textContent(), /^Time: \d+s$/);
+  assert.equal(await page.locator("#mine-counter").getAttribute("aria-label"), "Mines remaining: 000");
+  await page.locator("#reset").click();
+  assert.equal(await page.locator(".cell").count(), 25);
+  assert.equal(await page.locator("#message").textContent(), "");
 
   await page.locator("#btn-minimize").click();
   await app.evaluate(async ({ BrowserWindow }) => {
@@ -99,6 +134,9 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   assert.deepEqual(errors, []);
 
   const exited = new Promise((resolve) => app.process().once("exit", resolve));
-  await page.locator("#btn-close").click({ noWaitAfter: true });
+  // Return control to Playwright before the close handler terminates its connection.
+  await page.locator("#btn-close").evaluate((button) => {
+    setTimeout(() => button.click(), 0);
+  });
   assert.equal(await exited, 0);
 });

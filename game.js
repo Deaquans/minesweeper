@@ -39,7 +39,7 @@
   }
 
   let config, cells, state, flagsPlaced, revealedCount, timerId, seconds;
-  let customConfig = { rows: 9, cols: 9, mines: 10 };
+  let customConfig = { ...DIFFICULTIES.beginner };
   let lastDifficulty = difficultyEl.value;
 
   const SEGMENTS = {
@@ -57,7 +57,7 @@
     const text = pad(value);
     el.setAttribute("aria-label", `${el.title}: ${text}`);
     if (el.children.length !== 3) {
-      el.innerHTML = "";
+      el.replaceChildren();
       for (let i = 0; i < 3; i++) {
         const digit = document.createElement("div");
         digit.className = "digit";
@@ -89,7 +89,7 @@
     messageEl.textContent = "";
 
     cells = [];
-    boardEl.innerHTML = "";
+    boardEl.replaceChildren();
     boardEl.style.gridTemplateColumns = `repeat(${config.cols}, var(--cell-size))`;
     windowEl.style.setProperty("--board-cols", config.cols);
 
@@ -144,7 +144,10 @@
   // Mines are placed after the first click so the first click (and its neighbours) is always safe.
   function placeMines(safeCell) {
     const excluded = new Set([safeCell, ...neighbors(safeCell)]);
-    if (cells.length - excluded.size < config.mines) excluded.clear(), excluded.add(safeCell);
+    if (cells.length - excluded.size < config.mines) {
+      excluded.clear();
+      excluded.add(safeCell);
+    }
     const candidates = cells.filter((c) => !excluded.has(c));
     for (let i = 0; i < config.mines; i++) {
       const j = i + Math.floor(Math.random() * (candidates.length - i));
@@ -168,7 +171,9 @@
       revealedCount++;
       renderCell(cell);
       if (cell.adjacent === 0) {
-        for (const n of neighbors(cell)) if (!n.revealed && !n.mine) stack.push(n);
+        for (const neighbor of neighbors(cell)) {
+          if (!neighbor.revealed && !neighbor.mine) stack.push(neighbor);
+        }
       }
     }
     if (revealedCount === cells.length - config.mines) win();
@@ -309,8 +314,10 @@
   });
 
   resetBtn.addEventListener("click", newGame);
+
   function updateCustomMineLimit() {
-    customMinesEl.max = String(Math.max(Number(customMinesEl.min), Number(customWidthEl.value) * Number(customHeightEl.value) - 9));
+    const cellCount = Number(customWidthEl.value) * Number(customHeightEl.value);
+    customMinesEl.max = String(Math.max(Number(customMinesEl.min), cellCount - 9));
   }
 
   function hideCustomDialog() {
@@ -341,9 +348,9 @@
     if (!customForm.reportValidity()) return;
 
     customConfig = {
-      cols: Number(customWidthEl.value),
-      rows: Number(customHeightEl.value),
-      mines: Number(customMinesEl.value),
+      cols: customWidthEl.valueAsNumber,
+      rows: customHeightEl.valueAsNumber,
+      mines: customMinesEl.valueAsNumber,
     };
     lastDifficulty = "custom";
     customOverlay.hidden = true;
@@ -434,8 +441,9 @@
       if (e.key === "Escape") hideHelp();
       return;
     }
-    if (e.key === "r" || e.key === "R") newGame();
-    if (e.key === "h" || e.key === "H" || e.key === "?") showHelp();
+    const key = e.key.toLowerCase();
+    if (key === "r") newGame();
+    if (key === "h" || key === "?") showHelp();
   });
 
   newGame();

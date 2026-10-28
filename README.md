@@ -55,7 +55,8 @@ npm run dist
 ```
 
 Tests launch the actual Electron app and exercise native sizing, window controls,
-gameplay and custom boards. `pack` builds an unpacked application; `dist` builds
+custom-board validation and cancel, flagging, themes, winning and reset.
+`pack` builds an unpacked application; `dist` builds
 downloads for the current platform. Build macOS downloads on macOS and the Windows
 portable executable on Windows.
 
