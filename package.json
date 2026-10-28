@@ -33,11 +33,16 @@
       "repo": "minesweeper"
     },
     "win": {
-      "target": "portable"
+      "target": [
+        { "target": "portable", "arch": ["x64"] }
+      ]
     },
     "mac": {
-      "artifactName": "${productName}-${arch}.${ext}",
-      "target": ["dmg", "zip"],
+      "artifactName": "${productName}.${ext}",
+      "target": [
+        { "target": "dmg", "arch": ["arm64"] },
+        { "target": "zip", "arch": ["arm64"] }
+      ],
       "category": "public.app-category.games"
     }
   }

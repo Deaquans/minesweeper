@@ -23,9 +23,9 @@ jobs:
           - os: windows-latest
             platform: win
             architectures: "--x64"
-          - os: macos-15-intel
+          - os: macos-15
             platform: mac
-            architectures: "--x64 --arm64"
+            architectures: "--arm64"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

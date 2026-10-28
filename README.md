@@ -1,6 +1,7 @@
 # Minesweeper
 
-A compact, classic Minesweeper desktop app for Windows and macOS, built with
+A compact, classic Minesweeper desktop app for Windows 11+ and Apple Silicon Macs
+(including M4), built with
 Electron, HTML, CSS and JavaScript.
 
 ## Download
@@ -8,14 +9,15 @@ Electron, HTML, CSS and JavaScript.
 Desktop downloads are published to [GitHub Releases](https://github.com/Deaquans/minesweeper/releases)
 when a version tag is pushed:
 
-- **Windows:** download `Minesweeper.exe` and double-click to play. This is a
+- **Windows 11 or newer (x64):** download `Minesweeper.exe` and double-click to play. This is a
   portable application, not an installer: no setup wizard, shortcuts or admin
   rights are required. It extracts its runtime to a temporary folder on launch.
-- **Apple Silicon Mac:** download `Minesweeper-arm64.dmg`.
-- **Intel Mac:** download `Minesweeper-x64.dmg`.
+- **Apple Silicon Mac (including M4):** download `Minesweeper.dmg`.
 
-The application is named **Minesweeper** on both platforms. Mac
-downloads include the architecture only to distinguish the two builds.
+The application is named **Minesweeper** on both platforms. Mac downloads are
+native ARM64 builds; Intel Macs are not supported or packaged. Apple Silicon
+builds also work on compatible M1, M2 and M3 Macs; they do not require Rosetta.
+Windows 10 and older are not supported targets.
 
 On macOS, open the disk image and drag Minesweeper into Applications.
 These builds are unsigned; Windows SmartScreen or macOS Gatekeeper may warn
@@ -70,13 +72,14 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The desktop release workflow tests and builds Windows x64, macOS Apple Silicon,
-and macOS Intel downloads. Only when all builds succeed does it publish their
+The desktop release workflow tests and builds Windows x64 and macOS Apple Silicon
+downloads only. Only when all builds succeed does it publish their
 downloads to the tag's GitHub Release. Running the workflow manually produces
 downloadable Actions artifacts without publishing a release. To rebuild and publish
 an existing version, enter its tag in the manual workflow's `release_tag` field.
-Both Mac architectures are packaged on an Intel Mac runner; native integration
-tests run on Windows and Intel macOS.
+The Mac build and native integration tests run on an Apple Silicon runner.
+Windows integration tests run on a Windows runner; local Windows 11 tests verify
+the native square-corner setting.
 
 ## Files
 
