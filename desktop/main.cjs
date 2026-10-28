@@ -48,6 +48,7 @@ app.whenReady().then(() => {
     width: 290,
     height: 480,
     frame: false,
+    roundedCorners: false,
     show: false,
     resizable: false,
     maximizable: false,

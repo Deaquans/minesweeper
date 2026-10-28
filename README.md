@@ -8,16 +8,20 @@ Electron, HTML, CSS and JavaScript.
 Installers are published to [GitHub Releases](https://github.com/Deaquans/minesweeper/releases)
 when a version tag is pushed:
 
-- **Windows:** download the `win-x64.exe` installer.
-- **Apple Silicon Mac:** download the `mac-arm64.dmg`.
-- **Intel Mac:** download the `mac-x64.dmg`.
+- **Windows:** download `Minesweeper.exe`.
+- **Apple Silicon Mac:** download `Minesweeper-arm64.dmg`.
+- **Intel Mac:** download `Minesweeper-x64.dmg`.
+
+The installed application is named **Minesweeper** on both platforms. Mac
+downloads include the architecture only to distinguish the two builds.
 
 On macOS, open the disk image and drag Minesweeper into Applications.
 These builds are unsigned; Windows SmartScreen or macOS Gatekeeper may warn
 or block installation. Signed/notarized distribution requires platform signing
 certificates and, for macOS, an Apple Developer account; it is not configured here.
 
-The desktop app has no browser chrome or surrounding desktop background.
+The desktop app has sharp, square window corners, no browser chrome, and no
+surrounding desktop background.
 Drag its title bar to move it. Minimize uses the operating system's taskbar or
 Dock, maximize/fullscreen is disabled, and Close exits the app on both platforms.
 The window automatically fits the selected board.

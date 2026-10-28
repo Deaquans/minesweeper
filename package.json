@@ -19,7 +19,7 @@
   "build": {
     "appId": "com.deaquans.minesweeper",
     "productName": "Minesweeper",
-    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "artifactName": "${productName}.${ext}",
     "files": [
       "desktop/main.cjs",
       "desktop/preload.cjs",
@@ -41,6 +41,7 @@
       "shortcutName": "Minesweeper"
     },
     "mac": {
+      "artifactName": "${productName}-${arch}.${ext}",
       "target": ["dmg", "zip"],
       "category": "public.app-category.games"
     }

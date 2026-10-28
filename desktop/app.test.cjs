@@ -1,6 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
+const { execFileSync } = require("node:child_process");
 const { _electron: electron } = require("playwright");
 
 test("desktop window fits the game and native controls work", { timeout: 60000 }, async (t) => {
@@ -38,6 +39,23 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
     };
   });
   assert.deepEqual(settings, { resizable: false, maximizable: false, fullscreenable: false });
+
+  if (process.platform === "win32") {
+    const handle = await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0].getNativeWindowHandle().readBigUInt64LE().toString());
+    const preference = execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", `
+      Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices;
+      public static class WindowCorners {
+        [DllImport("dwmapi.dll")]
+        public static extern int DwmGetWindowAttribute(IntPtr hwnd, int attribute, out int value, int size);
+      }';
+      $preference = 0;
+      $result = [WindowCorners]::DwmGetWindowAttribute([IntPtr]::new(${handle}), 33, [ref]$preference, 4);
+      if ($result -ne 0) { throw "Cannot query native corner preference: $result" };
+      Write-Output $preference;
+    `], { encoding: "utf8" });
+    assert.equal(preference.trim(), "1", "Windows must disable native rounded corners");
+  }
 
   await page.locator("#window > .title-bar .title").dblclick();
   assert.equal(await app.evaluate(({ BrowserWindow }) =>
