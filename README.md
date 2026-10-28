@@ -1,6 +1,10 @@
 # Minesweeper
 A basic Minesweeper game built with plain HTML, CSS and JavaScript
 
+Choose **Custom...** from the Game menu to set a width of 5-30 cells, a height
+of 5-24 cells, and at least 5 mines. The maximum mine count is the number of
+cells minus 9, leaving room for a safe first click and its neighbours.
+
 ## Files
 - `index.html`: page structure
 - `style.css`: styling

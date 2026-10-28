@@ -12,7 +12,6 @@
   const timerEl = document.getElementById("timer");
   const resetBtn = document.getElementById("reset");
   const difficultyEl = document.getElementById("difficulty");
-  const flagModeBtn = document.getElementById("flag-mode");
   const messageEl = document.getElementById("message");
   const windowEl = document.getElementById("window");
   const desktopIcon = document.getElementById("desktop-icon");
@@ -20,8 +19,16 @@
   const taskbarItem = document.getElementById("taskbar-item");
   const maximizeBtn = document.getElementById("btn-maximize");
   const helpOverlay = document.getElementById("help-overlay");
+  const themeBtn = document.getElementById("btn-theme");
+  const customOverlay = document.getElementById("custom-overlay");
+  const customForm = document.getElementById("custom-form");
+  const customWidthEl = document.getElementById("custom-width");
+  const customHeightEl = document.getElementById("custom-height");
+  const customMinesEl = document.getElementById("custom-mines");
 
-  let config, cells, state, flagsPlaced, revealedCount, timerId, seconds, flagMode = false;
+  let config, cells, state, flagsPlaced, revealedCount, timerId, seconds;
+  let customConfig = { rows: 9, cols: 9, mines: 10 };
+  let lastDifficulty = difficultyEl.value;
 
   const SEGMENTS = {
     0: "abcdef", 1: "bc", 2: "abdeg", 3: "abcdg", 4: "bcfg",
@@ -59,7 +66,7 @@
   }
 
   function newGame() {
-    config = DIFFICULTIES[difficultyEl.value];
+    config = difficultyEl.value === "custom" ? { ...customConfig } : DIFFICULTIES[difficultyEl.value];
     state = "ready"; // ready | playing | won | lost
     flagsPlaced = 0;
     revealedCount = 0;
@@ -72,6 +79,7 @@
     cells = [];
     boardEl.innerHTML = "";
     boardEl.style.gridTemplateColumns = `repeat(${config.cols}, var(--cell-size))`;
+    windowEl.style.setProperty("--board-cols", config.cols);
 
     for (let r = 0; r < config.rows; r++) {
       for (let c = 0; c < config.cols; c++) {
@@ -234,16 +242,13 @@
     const best = Number(localStorage.getItem(key)) || Infinity;
     if (seconds < best) {
       localStorage.setItem(key, seconds);
-      messageEl.textContent = `You win! New best time: ${seconds}s 🎉`;
-    } else {
-      messageEl.textContent = `You win in ${seconds}s! (Best: ${best}s)`;
     }
+    messageEl.textContent = `Time: ${seconds}s`;
   }
 
   function handlePrimary(cell) {
     if (state === "won" || state === "lost") return;
     if (cell.revealed) return chord(cell);
-    if (flagMode) return toggleFlag(cell);
     if (cell.flagged) return;
     if (state === "ready") {
       placeMines(cell);
@@ -285,15 +290,50 @@
     if (state === "ready" || state === "playing") resetBtn.textContent = "🙂";
   });
 
-  function setFlagMode(on) {
-    flagMode = on;
-    flagModeBtn.setAttribute("aria-pressed", String(on));
-    flagModeBtn.textContent = `🚩 Flag mode: ${on ? "On" : "Off"}`;
+  resetBtn.addEventListener("click", newGame);
+  function updateCustomMineLimit() {
+    customMinesEl.max = String(Math.max(Number(customMinesEl.min), Number(customWidthEl.value) * Number(customHeightEl.value) - 9));
   }
 
-  flagModeBtn.addEventListener("click", () => setFlagMode(!flagMode));
-  resetBtn.addEventListener("click", newGame);
-  difficultyEl.addEventListener("change", newGame);
+  function hideCustomDialog() {
+    customOverlay.hidden = true;
+    difficultyEl.value = lastDifficulty;
+    difficultyEl.focus();
+  }
+
+  difficultyEl.addEventListener("change", () => {
+    if (difficultyEl.value === "custom") {
+      customWidthEl.value = String(customConfig.cols);
+      customHeightEl.value = String(customConfig.rows);
+      customMinesEl.value = String(customConfig.mines);
+      updateCustomMineLimit();
+      customOverlay.hidden = false;
+      customWidthEl.focus();
+      return;
+    }
+    lastDifficulty = difficultyEl.value;
+    newGame();
+  });
+
+  customWidthEl.addEventListener("input", updateCustomMineLimit);
+  customHeightEl.addEventListener("input", updateCustomMineLimit);
+  customForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    updateCustomMineLimit();
+    if (!customForm.reportValidity()) return;
+
+    customConfig = {
+      cols: Number(customWidthEl.value),
+      rows: Number(customHeightEl.value),
+      mines: Number(customMinesEl.value),
+    };
+    lastDifficulty = "custom";
+    customOverlay.hidden = true;
+    difficultyEl.focus();
+    newGame();
+  });
+  document.getElementById("custom-cancel").addEventListener("click", hideCustomDialog);
+  document.getElementById("custom-x").addEventListener("click", hideCustomDialog);
 
   // ---- Window controls ----
   // When wrapped as a desktop app, expose `window.nativeWindow = { close, minimize, toggleMaximize }`
@@ -303,6 +343,7 @@
   function closeWindow() {
     if (native?.close) return native.close();
     hideHelp();
+    hideCustomDialog();
     windowEl.classList.remove("maximized");
     windowEl.hidden = true;
     taskbarEl.hidden = true;
@@ -356,6 +397,13 @@
   }
 
   document.getElementById("btn-help").addEventListener("click", showHelp);
+  themeBtn.addEventListener("click", () => {
+    const dark = document.body.dataset.theme !== "dark";
+    document.body.dataset.theme = dark ? "dark" : "light";
+    themeBtn.setAttribute("aria-pressed", String(dark));
+    themeBtn.title = `Switch to ${dark ? "light" : "dark"} theme`;
+    themeBtn.textContent = `${dark ? "☀️" : "🌙"} Theme`;
+  });
   document.getElementById("help-ok").addEventListener("click", hideHelp);
   document.getElementById("help-x").addEventListener("click", hideHelp);
   helpOverlay.addEventListener("click", (e) => {
@@ -363,13 +411,16 @@
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.target === difficultyEl || e.metaKey || e.ctrlKey || windowEl.hidden) return;
+    if (e.target.matches("input, select, textarea") || e.metaKey || e.ctrlKey || windowEl.hidden) return;
+    if (!customOverlay.hidden) {
+      if (e.key === "Escape") hideCustomDialog();
+      return;
+    }
     if (!helpOverlay.hidden) {
       if (e.key === "Escape") hideHelp();
       return;
     }
     if (e.key === "r" || e.key === "R") newGame();
-    if (e.key === "f" || e.key === "F") setFlagMode(!flagMode);
     if (e.key === "h" || e.key === "H" || e.key === "?") showHelp();
   });
 
