@@ -1,5 +1,5 @@
-# Minesweeper
-A basic Minesweeper game built with plain HTML, CSS and JavaScript
+# Bombsweeper
+A basic bombsweeper game built with plain HTML, CSS and JavaScript
 
 ## Files
 - `index.html`: page structure
