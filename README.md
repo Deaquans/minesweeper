@@ -76,7 +76,9 @@ The desktop release workflow tests and builds Windows x64 and macOS Apple Silico
 downloads only. Only when all builds succeed does it publish their
 downloads to the tag's GitHub Release. Running the workflow manually produces
 downloadable Actions artifacts without publishing a release. To rebuild and publish
-an existing version, enter its tag in the manual workflow's `release_tag` field.
+an existing release's downloads from the selected branch, enter its tag in the
+manual workflow's `release_tag` field. This replaces binaries, not the existing
+Git tag or its source archives.
 The Mac build and native integration tests run on an Apple Silicon runner.
 Windows integration tests run on a Windows runner; local Windows 11 tests verify
 the native square-corner setting.
