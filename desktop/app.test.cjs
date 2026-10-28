@@ -35,10 +35,11 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
     return {
       resizable: window.isResizable(),
       maximizable: window.isMaximizable(),
-      fullscreenable: window.isFullScreenable()
+      fullscreenable: window.isFullScreenable(),
+      shadow: window.hasShadow()
     };
   });
-  assert.deepEqual(settings, { resizable: false, maximizable: false, fullscreenable: false });
+  assert.deepEqual(settings, { resizable: false, maximizable: false, fullscreenable: false, shadow: false });
 
   if (process.platform === "win32") {
     const handle = await app.evaluate(({ BrowserWindow }) =>
@@ -98,6 +99,6 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   assert.deepEqual(errors, []);
 
   const exited = new Promise((resolve) => app.process().once("exit", resolve));
-  await page.locator("#btn-close").click();
+  await page.locator("#btn-close").click({ noWaitAfter: true });
   assert.equal(await exited, 0);
 });

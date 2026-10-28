@@ -5,14 +5,16 @@ Electron, HTML, CSS and JavaScript.
 
 ## Download
 
-Installers are published to [GitHub Releases](https://github.com/Deaquans/minesweeper/releases)
+Desktop downloads are published to [GitHub Releases](https://github.com/Deaquans/minesweeper/releases)
 when a version tag is pushed:
 
-- **Windows:** download `Minesweeper.exe`.
+- **Windows:** download `Minesweeper.exe` and double-click to play. This is a
+  portable application, not an installer: no setup wizard, shortcuts or admin
+  rights are required. It extracts its runtime to a temporary folder on launch.
 - **Apple Silicon Mac:** download `Minesweeper-arm64.dmg`.
 - **Intel Mac:** download `Minesweeper-x64.dmg`.
 
-The installed application is named **Minesweeper** on both platforms. Mac
+The application is named **Minesweeper** on both platforms. Mac
 downloads include the architecture only to distinguish the two builds.
 
 On macOS, open the disk image and drag Minesweeper into Applications.
@@ -20,7 +22,7 @@ These builds are unsigned; Windows SmartScreen or macOS Gatekeeper may warn
 or block installation. Signed/notarized distribution requires platform signing
 certificates and, for macOS, an Apple Developer account; it is not configured here.
 
-The desktop app has sharp, square window corners, no browser chrome, and no
+The desktop app has sharp, square window corners, no native window shadow, no browser chrome, and no
 surrounding desktop background.
 Drag its title bar to move it. Minimize uses the operating system's taskbar or
 Dock, maximize/fullscreen is disabled, and Close exits the app on both platforms.
@@ -52,8 +54,8 @@ npm run dist
 
 Tests launch the actual Electron app and exercise native sizing, window controls,
 gameplay and custom boards. `pack` builds an unpacked application; `dist` builds
-installers for the current platform. Build macOS installers on macOS and Windows
-installers on Windows.
+downloads for the current platform. Build macOS downloads on macOS and the Windows
+portable executable on Windows.
 
 Opening `index.html` in a browser still runs the game with simulated window
 controls, but the downloadable desktop app uses real native controls.
@@ -69,7 +71,7 @@ git push origin v1.0.0
 ```
 
 The desktop release workflow tests and builds Windows x64, macOS Apple Silicon,
-and macOS Intel installers. Only when all builds succeed does it publish their
+and macOS Intel downloads. Only when all builds succeed does it publish their
 downloads to the tag's GitHub Release. Running the workflow manually produces
 downloadable Actions artifacts without publishing a release. To rebuild and publish
 an existing version, enter its tag in the manual workflow's `release_tag` field.

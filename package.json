@@ -33,12 +33,7 @@
       "repo": "minesweeper"
     },
     "win": {
-      "target": "nsis"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Minesweeper"
+      "target": "portable"
     },
     "mac": {
       "artifactName": "${productName}-${arch}.${ext}",
