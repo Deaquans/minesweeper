@@ -205,8 +205,7 @@ select {
   cursor: pointer;
 }
 
-.bevel-btn:active,
-.bevel-btn[aria-pressed="true"] {
+.bevel-btn:active {
   border-color: var(--dark) var(--light) var(--light) var(--dark);
   box-shadow: inset 1px 1px var(--shadow);
   padding: 4px 9px 2px 11px;
