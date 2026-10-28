@@ -67,7 +67,10 @@ git push origin v1.0.0
 The desktop release workflow tests and builds Windows x64, macOS Apple Silicon,
 and macOS Intel installers. Only when all builds succeed does it publish their
 downloads to the tag's GitHub Release. Running the workflow manually produces
-downloadable Actions artifacts without publishing a release.
+downloadable Actions artifacts without publishing a release. To rebuild and publish
+an existing version, enter its tag in the manual workflow's `release_tag` field.
+Both Mac architectures are packaged on an Intel Mac runner; native integration
+tests run on Windows and Intel macOS.
 
 ## Files
 
