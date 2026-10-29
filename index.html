@@ -45,8 +45,29 @@
 
       <div class="status-line">
         <p id="message" class="message" aria-live="polite"></p>
+        <button id="btn-settings" class="bevel-btn small" type="button" title="Settings">⚙️ Settings</button>
         <button id="btn-help" class="bevel-btn small" type="button" title="Help (H)">❓ Help</button>
         <button id="btn-theme" class="bevel-btn small" type="button" title="Switch to dark theme" aria-pressed="false">🌙 Theme</button>
+      </div>
+
+      <div id="settings-overlay" class="dialog-overlay" hidden>
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+          <div class="title-bar">
+            <span class="title" id="settings-title">Minesweeper Settings</span>
+            <div class="title-buttons">
+              <button id="settings-x" type="button" title="Close" aria-label="Close settings"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+            </div>
+          </div>
+          <div class="dialog-body">
+            <label class="settings-option" for="settings-dark-theme">
+              <input id="settings-dark-theme" type="checkbox" />
+              Dark theme
+            </label>
+            <div class="dialog-actions">
+              <button id="settings-ok" class="bevel-btn" type="button">OK</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="custom-overlay" class="dialog-overlay" hidden>

@@ -43,6 +43,11 @@ body[data-theme="dark"] .title-bar {
   background: linear-gradient(90deg, #233044, #3b5f83);
 }
 
+body[data-theme="dark"] .bevel-btn,
+body[data-theme="dark"] .title-buttons button {
+  color: #e8edf2;
+}
+
 body[data-theme="dark"] select,
 body[data-theme="dark"] input {
   color: #e8edf2;
@@ -389,6 +394,15 @@ select {
 .dialog-body li { margin-bottom: 4px; }
 .dialog-actions { display: flex; justify-content: center; }
 .dialog-actions .bevel-btn { min-width: 75px; }
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.settings-option input { margin: 0; }
 
 #custom-form {
   display: grid;

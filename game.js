@@ -19,6 +19,8 @@
   const taskbarItem = document.getElementById("taskbar-item");
   const maximizeBtn = document.getElementById("btn-maximize");
   const helpOverlay = document.getElementById("help-overlay");
+  const settingsOverlay = document.getElementById("settings-overlay");
+  const settingsTheme = document.getElementById("settings-dark-theme");
   const themeBtn = document.getElementById("btn-theme");
   const customOverlay = document.getElementById("custom-overlay");
   const customForm = document.getElementById("custom-form");
@@ -364,6 +366,7 @@
   function closeWindow() {
     if (native?.close) return native.close();
     hideHelp();
+    hideSettings();
     hideCustomDialog();
     windowEl.classList.remove("maximized");
     windowEl.hidden = true;
@@ -418,21 +421,43 @@
   }
 
   document.getElementById("btn-help").addEventListener("click", showHelp);
-  themeBtn.addEventListener("click", () => {
-    const dark = document.body.dataset.theme !== "dark";
+  function setTheme(dark) {
     document.body.dataset.theme = dark ? "dark" : "light";
     themeBtn.setAttribute("aria-pressed", String(dark));
     themeBtn.title = `Switch to ${dark ? "light" : "dark"} theme`;
     themeBtn.textContent = `${dark ? "☀️" : "🌙"} Theme`;
+    settingsTheme.checked = dark;
+  }
+
+  themeBtn.addEventListener("click", () => {
+    setTheme(document.body.dataset.theme !== "dark");
   });
+  settingsTheme.addEventListener("change", () => setTheme(settingsTheme.checked));
   document.getElementById("help-ok").addEventListener("click", hideHelp);
   document.getElementById("help-x").addEventListener("click", hideHelp);
   helpOverlay.addEventListener("click", (e) => {
     if (e.target === helpOverlay) hideHelp();
   });
 
+  function showSettings() {
+    settingsOverlay.hidden = false;
+    settingsTheme.focus();
+  }
+
+  function hideSettings() {
+    settingsOverlay.hidden = true;
+    document.getElementById("btn-settings").focus();
+  }
+
+  document.getElementById("btn-settings").addEventListener("click", showSettings);
+  document.getElementById("settings-ok").addEventListener("click", hideSettings);
+  document.getElementById("settings-x").addEventListener("click", hideSettings);
+  settingsOverlay.addEventListener("click", (e) => {
+    if (e.target === settingsOverlay) hideSettings();
+  });
+
   document.addEventListener("keydown", (e) => {
-    if (e.target.matches("input, select, textarea") || e.metaKey || e.ctrlKey || windowEl.hidden) return;
+    if (e.metaKey || e.ctrlKey || windowEl.hidden) return;
     if (!customOverlay.hidden) {
       if (e.key === "Escape") hideCustomDialog();
       return;
@@ -441,6 +466,11 @@
       if (e.key === "Escape") hideHelp();
       return;
     }
+    if (!settingsOverlay.hidden) {
+      if (e.key === "Escape") hideSettings();
+      return;
+    }
+    if (e.target.matches("input, select, textarea")) return;
     const key = e.key.toLowerCase();
     if (key === "r") newGame();
     if (key === "h" || key === "?") showHelp();
