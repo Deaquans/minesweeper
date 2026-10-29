@@ -20,6 +20,7 @@
     "appId": "com.deaquans.minesweeper",
     "productName": "Minesweeper",
     "artifactName": "${productName}.${ext}",
+    "electronLanguages": ["en"],
     "files": [
       "desktop/main.cjs",
       "desktop/preload.cjs",
@@ -43,6 +44,9 @@
         { "target": "dmg", "arch": ["arm64"] }
       ],
       "category": "public.app-category.games"
+    },
+    "dmg": {
+      "format": "UDBZ"
     }
   }
 }
