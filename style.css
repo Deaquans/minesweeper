@@ -387,9 +387,16 @@ select {
 .status-line > .bevel-btn {
   position: relative;
   top: 1px;
-  width: 84px;
+  width: 86px;
+  padding: 2px 4px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
+
+.status-line > .bevel-btn:active { padding: 3px 3px 1px 5px; }
 
 /* Help dialog */
 .dialog-overlay {
