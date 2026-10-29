@@ -120,20 +120,13 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   await page.locator("#difficulty").selectOption("expert");
   assert.equal(await page.locator(".cell").count(), 480);
   await assertFits();
-  await page.locator("#difficulty").selectOption("custom");
-  await page.locator("#custom-cancel").click();
-  assert.equal(await page.locator("#difficulty").inputValue(), "expert");
-  assert.equal(await page.locator(".cell").count(), 480);
-  await page.locator("#difficulty").selectOption("custom");
-  await page.locator("#custom-width").fill("5");
-  await page.locator("#custom-height").fill("5");
-  await page.locator("#custom-mines").fill("5");
-  await page.locator("#custom-width").fill("4");
-  assert.equal(await page.locator("#custom-form").evaluate((form) => form.checkValidity()), false);
-  await page.locator("#custom-width").fill("5");
-  assert.equal(await page.locator("#custom-form").evaluate((form) => form.checkValidity()), true);
-  await page.locator("#custom-form button[type=submit]").click();
-  assert.equal(await page.locator(".cell").count(), 25);
+  assert.deepEqual(await page.locator("#difficulty option").evaluateAll((options) =>
+    options.map((option) => option.value)), ["beginner", "intermediate", "expert"]);
+  await page.locator("#difficulty").selectOption("intermediate");
+  assert.equal(await page.locator(".cell").count(), 256);
+  await assertFits();
+  await page.locator("#difficulty").selectOption("beginner");
+  assert.equal(await page.locator(".cell").count(), 81);
   await assertFits();
 
   const first = page.locator(".cell").first();
@@ -162,7 +155,7 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
     } finally {
       Math.random = random;
     }
-    const mines = new Set([2, 3, 4, 7, 8]);
+    const mines = new Set([2, 3, 4, 5, 6, 7, 8, 11, 12, 13]);
     document.querySelectorAll(".cell").forEach((cell, index) => {
       if (!mines.has(index)) cell.click();
     });
@@ -171,7 +164,7 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   assert.match(await page.locator("#message").textContent(), /^Time: \d+s$/);
   assert.equal(await page.locator("#mine-counter").getAttribute("aria-label"), "Mines remaining: 000");
   await page.locator("#reset").click();
-  assert.equal(await page.locator(".cell").count(), 25);
+  assert.equal(await page.locator(".cell").count(), 81);
   assert.equal(await page.locator("#message").textContent(), "");
 
   await page.locator("#btn-minimize").click();

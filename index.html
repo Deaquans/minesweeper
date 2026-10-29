@@ -30,7 +30,6 @@
           <option value="beginner">Beginner (9×9, 10)</option>
           <option value="intermediate">Intermediate (16×16, 40)</option>
           <option value="expert">Expert (30×16, 99)</option>
-          <option value="custom">Custom...</option>
         </select>
       </div>
 
@@ -76,29 +75,6 @@
         </div>
       </div>
 
-      <div id="custom-overlay" class="dialog-overlay" hidden>
-        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="custom-title">
-          <div class="title-bar">
-            <span class="title" id="custom-title">Custom field</span>
-            <div class="title-buttons">
-              <button id="custom-x" type="button" title="Cancel" aria-label="Cancel custom game"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
-            </div>
-          </div>
-          <form id="custom-form" class="dialog-body">
-            <label for="custom-width">Width:</label>
-            <input id="custom-width" type="number" min="5" max="30" step="1" value="9" required />
-            <label for="custom-height">Height:</label>
-            <input id="custom-height" type="number" min="5" max="24" step="1" value="9" required />
-            <label for="custom-mines">Mines:</label>
-            <input id="custom-mines" type="number" min="5" max="72" step="1" value="10" required />
-            <div class="dialog-actions">
-              <button class="bevel-btn" type="submit">Start</button>
-              <button id="custom-cancel" class="bevel-btn" type="button">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <div id="help-overlay" class="dialog-overlay" hidden>
         <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
           <div class="title-bar">
@@ -113,7 +89,7 @@
               <li><b>Click</b> to reveal a square. Your first click is always safe.</li>
               <li><b>Right-click</b>, <b>Ctrl-click</b> or <b>⌘-click</b> to place a flag.</li>
               <li><b>Click a number</b> with the right flags around it to reveal its neighbours.</li>
-              <li>Choose <b>Custom...</b> from Game to set the field size and mine count.</li>
+              <li>Choose <b>Beginner</b>, <b>Intermediate</b> or <b>Expert</b> from Game.</li>
               <li><b>🙂</b> or <kbd>R</kbd>: new game · <kbd>H</kbd>: help</li>
             </ul>
             <div class="dialog-actions">

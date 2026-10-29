@@ -22,11 +22,6 @@
   const settingsOverlay = document.getElementById("settings-overlay");
   const settingsCounterColor = document.getElementById("settings-counter-color");
   const themeBtn = document.getElementById("btn-theme");
-  const customOverlay = document.getElementById("custom-overlay");
-  const customForm = document.getElementById("custom-form");
-  const customWidthEl = document.getElementById("custom-width");
-  const customHeightEl = document.getElementById("custom-height");
-  const customMinesEl = document.getElementById("custom-mines");
   const native = window.nativeWindow;
 
   if (native) {
@@ -41,8 +36,6 @@
   }
 
   let config, cells, state, flagsPlaced, revealedCount, timerId, seconds;
-  let customConfig = { ...DIFFICULTIES.beginner };
-  let lastDifficulty = difficultyEl.value;
 
   const SEGMENTS = {
     0: "abcdef", 1: "bc", 2: "abdeg", 3: "abcdg", 4: "bcfg",
@@ -80,7 +73,7 @@
   }
 
   function newGame() {
-    config = difficultyEl.value === "custom" ? { ...customConfig } : DIFFICULTIES[difficultyEl.value];
+    config = DIFFICULTIES[difficultyEl.value];
     state = "ready"; // ready | playing | won | lost
     flagsPlaced = 0;
     revealedCount = 0;
@@ -317,57 +310,13 @@
 
   resetBtn.addEventListener("click", newGame);
 
-  function updateCustomMineLimit() {
-    const cellCount = Number(customWidthEl.value) * Number(customHeightEl.value);
-    customMinesEl.max = String(Math.max(Number(customMinesEl.min), cellCount - 9));
-  }
-
-  function hideCustomDialog() {
-    customOverlay.hidden = true;
-    difficultyEl.value = lastDifficulty;
-    difficultyEl.focus();
-  }
-
-  difficultyEl.addEventListener("change", () => {
-    if (difficultyEl.value === "custom") {
-      customWidthEl.value = String(customConfig.cols);
-      customHeightEl.value = String(customConfig.rows);
-      customMinesEl.value = String(customConfig.mines);
-      updateCustomMineLimit();
-      customOverlay.hidden = false;
-      customWidthEl.focus();
-      return;
-    }
-    lastDifficulty = difficultyEl.value;
-    newGame();
-  });
-
-  customWidthEl.addEventListener("input", updateCustomMineLimit);
-  customHeightEl.addEventListener("input", updateCustomMineLimit);
-  customForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    updateCustomMineLimit();
-    if (!customForm.reportValidity()) return;
-
-    customConfig = {
-      cols: customWidthEl.valueAsNumber,
-      rows: customHeightEl.valueAsNumber,
-      mines: customMinesEl.valueAsNumber,
-    };
-    lastDifficulty = "custom";
-    customOverlay.hidden = true;
-    difficultyEl.focus();
-    newGame();
-  });
-  document.getElementById("custom-cancel").addEventListener("click", hideCustomDialog);
-  document.getElementById("custom-x").addEventListener("click", hideCustomDialog);
+  difficultyEl.addEventListener("change", newGame);
 
   // ---- Window controls ----
   function closeWindow() {
     if (native?.close) return native.close();
     hideHelp();
     hideSettings();
-    hideCustomDialog();
     windowEl.classList.remove("maximized");
     windowEl.hidden = true;
     taskbarEl.hidden = true;
@@ -491,10 +440,6 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || windowEl.hidden) return;
-    if (!customOverlay.hidden) {
-      if (e.key === "Escape") hideCustomDialog();
-      return;
-    }
     if (!helpOverlay.hidden) {
       if (e.key === "Escape") hideHelp();
       return;

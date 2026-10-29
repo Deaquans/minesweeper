@@ -426,27 +426,6 @@ select {
   margin-bottom: 12px;
 }
 
-#custom-form {
-  display: grid;
-  grid-template-columns: 1fr 90px;
-  align-items: center;
-  gap: 8px 12px;
-}
-
-#custom-form input {
-  width: 100%;
-  min-width: 0;
-  padding: 3px 4px;
-  font: inherit;
-}
-
-#custom-form .dialog-actions {
-  grid-column: 1 / -1;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
-
 /* Desktop icon shown when the window is closed */
 .desktop-icon {
   position: absolute;
