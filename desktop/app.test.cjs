@@ -74,10 +74,30 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   await page.waitForSelector(".cell");
 
   async function assertFits() {
-    await page.waitForFunction(() => {
-      const bounds = document.querySelector("#window").getBoundingClientRect();
-      return Math.ceil(bounds.width) === innerWidth && Math.ceil(bounds.height) === innerHeight;
-    });
+    try {
+      await page.waitForFunction(() => {
+        const bounds = document.querySelector("#window").getBoundingClientRect();
+        return Math.ceil(bounds.width) === innerWidth && Math.ceil(bounds.height) === innerHeight;
+      });
+    } catch (error) {
+      t.diagnostic(JSON.stringify({
+        renderer: await page.evaluate(() => ({
+          width: innerWidth,
+          height: innerHeight,
+          bounds: document.querySelector("#window").getBoundingClientRect().toJSON(),
+          difficulty: document.querySelector("#difficulty").value,
+        })),
+        native: await app.evaluate(({ BrowserWindow, screen }) => {
+          const window = BrowserWindow.getAllWindows()[0];
+          return {
+            bounds: window.getBounds(),
+            content: window.getContentSize(),
+            workArea: screen.getDisplayMatching(window.getBounds()).workArea,
+          };
+        }),
+      }));
+      throw error;
+    }
     const bounds = await page.locator("#window").boundingBox();
     assert.equal(bounds.x, 0);
     assert.equal(bounds.y, 0);
