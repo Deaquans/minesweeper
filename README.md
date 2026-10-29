@@ -21,9 +21,7 @@ Windows 10 and older are not supported targets.
 ## Playing
 
 Click to reveal a tile; right-click or Command-click to flag it.
-Choose **Custom...** from Game for widths of 5-30, heights of 5-24, and at least
-5 mines. The maximum mine count is the number of cells minus 9 to protect the
-first click and its neighbours. Use **R** to restart and **H** for Help.
+Use **R** to restart and **H** for Help.
 Theme switches between classic and dark palettes. The message box displays
 your time after completing a board.
 
