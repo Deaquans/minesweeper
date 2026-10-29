@@ -58,6 +58,51 @@ test("theme and counter color survive quitting and reopening", { timeout: 60000 
   }
 });
 
+test("Expert fits a small work area with taller platform controls", { timeout: 60000 }, async (t) => {
+  const userData = await mkdtemp(path.join(os.tmpdir(), "minesweeper-sizing-"));
+  const env = { ...process.env };
+  delete env.ELECTRON_RUN_AS_NODE;
+  const executablePath = process.env.MINESWEEPER_EXECUTABLE;
+  let app;
+  t.after(async () => {
+    if (app) await app.close();
+    await rm(userData, { recursive: true, force: true });
+  });
+  app = await electron.launch({
+    executablePath,
+    args: [...(executablePath ? [] : [path.join(__dirname, "..")]), `--user-data-dir=${userData}`],
+    env
+  });
+  const page = await app.firstWindow();
+  await page.waitForSelector(".cell");
+  await app.evaluate(({ screen }) => {
+    const getDisplayMatching = screen.getDisplayMatching.bind(screen);
+    screen.getDisplayMatching = (bounds) => ({
+      ...getDisplayMatching(bounds),
+      workAreaSize: { width: 1024, height: 684 },
+    });
+  });
+  await Promise.all([
+    page.waitForEvent("load"),
+    app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.reload()),
+  ]);
+  await page.waitForSelector(".cell");
+  await page.addStyleTag({ content: ".status-line { padding-bottom: 80px; }" });
+  for (const [mode, count] of [["expert", 480], ["beginner", 81], ["expert", 480]]) {
+    await page.locator("#difficulty").selectOption(mode);
+    await page.waitForFunction(() => {
+      const bounds = document.querySelector("#window").getBoundingClientRect();
+      return Math.ceil(bounds.width) === innerWidth && Math.ceil(bounds.height) === innerHeight;
+    });
+    assert.equal(await page.locator(".cell").count(), count);
+    const bounds = await page.locator("#window").boundingBox();
+    assert.ok(bounds.width <= 1024);
+    assert.ok(bounds.height <= 684);
+    assert.equal(await page.locator(".cell").first().evaluate((el) =>
+      getComputedStyle(el).width === getComputedStyle(el).height), true);
+  }
+});
+
 test("desktop window fits the game and native controls work", { timeout: 60000 }, async (t) => {
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;

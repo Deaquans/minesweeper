@@ -21,6 +21,8 @@ Windows 10 and older are not supported targets.
 ## Playing
 
 Click to reveal a tile; right-click or Command-click to flag it.
+The desktop board measures the rendered controls and shrinks its tiles when needed
+to fit the display's available work area.
 Use **R** to restart and **H** for Help.
 Theme switches between classic and dark palettes. Settings lets you choose red
 (default), blue, green, yellow or purple for the timer and mine counter.

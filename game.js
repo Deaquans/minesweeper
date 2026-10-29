@@ -106,8 +106,18 @@
   function fitBoard() {
     if (native) {
       const { width, height } = native.workArea;
-      const size = Math.floor(Math.min(28, (width - 38) / config.cols, (height - 220) / config.rows));
-      document.documentElement.style.setProperty("--cell-size", `${Math.max(16, size)}px`);
+      let size = 28;
+      document.documentElement.style.setProperty("--cell-size", `${size}px`);
+      while (size > 16) {
+        const bounds = windowEl.getBoundingClientRect();
+        const overflow = Math.max(
+          Math.ceil((bounds.width - width) / config.cols),
+          Math.ceil((bounds.height - height) / config.rows),
+        );
+        if (overflow <= 0) break;
+        size = Math.max(16, size - overflow);
+        document.documentElement.style.setProperty("--cell-size", `${size}px`);
+      }
       return;
     }
     const maximized = windowEl.classList.contains("maximized");
