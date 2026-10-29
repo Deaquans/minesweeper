@@ -18,16 +18,11 @@ native ARM64 builds; Intel Macs are not supported or packaged. Apple Silicon
 builds also work on compatible M1, M2 and M3 Macs; they do not require Rosetta.
 Windows 10 and older are not supported targets.
 
-## Playing
+## Keybinds
 
-Click to reveal a tile; right-click or Command-click to flag it.
-The desktop board measures the rendered controls and shrinks its tiles when needed
-to fit the display's available work area.
-Use **R** to restart and **H** for Help.
-Theme switches between classic and dark palettes. Settings lets you choose red
-(default), blue, green, yellow or purple for the timer and mine counter.
-Your theme and counter color are saved automatically and restored when you reopen
-the app. The message box displays your time after completing a board.
+**Right-click** or **Command-click** to flag tile.
+**R** to restart game.
+**H** to open help button.
 
 ## Files
 
