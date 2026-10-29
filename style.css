@@ -11,7 +11,8 @@
 
 button:focus:not(:focus-visible) { outline: none; }
 
-button:focus-visible {
+button:focus-visible,
+select:focus {
   outline: 1px dotted currentColor;
   outline-offset: -4px;
 }
@@ -21,6 +22,8 @@ button:focus-visible {
 html, body { height: 100%; }
 
 body {
+  --counter-on: #ff0000;
+  --counter-off: #2b0000;
   margin: 0;
   overflow: auto;
   background: #008080;
@@ -37,6 +40,26 @@ body[data-theme="dark"] {
   --dark: #090a0c;
   color: #e8edf2;
   background: #18212b;
+}
+
+body[data-counter-color="blue"] {
+  --counter-on: #168cff;
+  --counter-off: #001a33;
+}
+
+body[data-counter-color="green"] {
+  --counter-on: #00e000;
+  --counter-off: #002600;
+}
+
+body[data-counter-color="yellow"] {
+  --counter-on: #ffe000;
+  --counter-off: #332b00;
+}
+
+body[data-counter-color="purple"] {
+  --counter-on: #c060ff;
+  --counter-off: #240033;
 }
 
 body[data-theme="dark"] .title-bar {
@@ -241,10 +264,10 @@ select {
 
 .seg {
   position: absolute;
-  background: #2b0000;
+  background: var(--counter-off);
 }
 
-.seg.on { background: #ff0000; }
+.seg.on { background: var(--counter-on); }
 
 .seg.a, .seg.d, .seg.g {
   left: 1px;
@@ -398,11 +421,10 @@ select {
 .settings-option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
 }
-
-.settings-option input { margin: 0; }
 
 #custom-form {
   display: grid;

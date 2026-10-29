@@ -20,7 +20,7 @@
   const maximizeBtn = document.getElementById("btn-maximize");
   const helpOverlay = document.getElementById("help-overlay");
   const settingsOverlay = document.getElementById("settings-overlay");
-  const settingsTheme = document.getElementById("settings-dark-theme");
+  const settingsCounterColor = document.getElementById("settings-counter-color");
   const themeBtn = document.getElementById("btn-theme");
   const customOverlay = document.getElementById("custom-overlay");
   const customForm = document.getElementById("custom-form");
@@ -426,13 +426,14 @@
     themeBtn.setAttribute("aria-pressed", String(dark));
     themeBtn.title = `Switch to ${dark ? "light" : "dark"} theme`;
     themeBtn.textContent = `${dark ? "☀️" : "🌙"} Theme`;
-    settingsTheme.checked = dark;
   }
 
   themeBtn.addEventListener("click", () => {
     setTheme(document.body.dataset.theme !== "dark");
   });
-  settingsTheme.addEventListener("change", () => setTheme(settingsTheme.checked));
+  settingsCounterColor.addEventListener("change", () => {
+    document.body.dataset.counterColor = settingsCounterColor.value;
+  });
   document.getElementById("help-ok").addEventListener("click", hideHelp);
   document.getElementById("help-x").addEventListener("click", hideHelp);
   helpOverlay.addEventListener("click", (e) => {
@@ -441,7 +442,7 @@
 
   function showSettings() {
     settingsOverlay.hidden = false;
-    settingsTheme.focus();
+    settingsCounterColor.focus();
   }
 
   function hideSettings() {
