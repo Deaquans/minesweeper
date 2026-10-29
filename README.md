@@ -20,9 +20,9 @@ Windows 10 and older are not supported targets.
 
 ## Keybinds
 
-**Right-click** or **Command-click** to flag tile.
-**R** to restart game.
-**H** to open help button.
+**Right-click** or **Command-click** to flag tile.__
+**R** to restart game.__
+**H** to open help button.__
 
 ## Files
 
