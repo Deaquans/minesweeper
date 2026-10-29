@@ -1,8 +1,62 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
+const { mkdtemp, rm } = require("node:fs/promises");
+const os = require("node:os");
 const { execFileSync } = require("node:child_process");
 const { _electron: electron } = require("playwright");
+
+test("theme and counter color survive quitting and reopening", { timeout: 60000 }, async (t) => {
+  const userData = await mkdtemp(path.join(os.tmpdir(), "minesweeper-settings-"));
+  const env = { ...process.env };
+  delete env.ELECTRON_RUN_AS_NODE;
+  const executablePath = process.env.MINESWEEPER_EXECUTABLE;
+  let app;
+  t.after(async () => {
+    if (app) await app.close();
+    await rm(userData, { recursive: true, force: true });
+  });
+  async function launch() {
+    app = await electron.launch({
+      executablePath,
+      args: [...(executablePath ? [] : [path.join(__dirname, "..")]), `--user-data-dir=${userData}`],
+      env
+    });
+    const page = await app.firstWindow();
+    await page.waitForSelector(".cell");
+    return page;
+  }
+  async function quit(page) {
+    const exited = new Promise((resolve) => app.process().once("exit", resolve));
+    await page.locator("#btn-close").evaluate((button) => setTimeout(() => button.click(), 0));
+    assert.equal(await exited, 0);
+    app = null;
+  }
+
+  let page = await launch();
+  await page.locator("#btn-settings").click();
+  await page.locator("#settings-counter-color").selectOption("blue");
+  await page.locator("#settings-ok").click();
+  await quit(page);
+
+  page = await launch();
+  assert.equal(await page.locator("body").getAttribute("data-theme"), "light");
+  assert.equal(await page.locator("#settings-counter-color").inputValue(), "blue");
+  await page.locator("#btn-theme").click();
+  await page.locator("#btn-settings").click();
+  await page.locator("#settings-counter-color").selectOption("purple");
+  await page.locator("#settings-ok").click();
+  await quit(page);
+
+  page = await launch();
+  assert.equal(await page.locator("body").getAttribute("data-theme"), "dark");
+  assert.equal(await page.locator("#btn-theme").getAttribute("aria-pressed"), "true");
+  assert.equal(await page.locator("#settings-counter-color").inputValue(), "purple");
+  for (const id of ["timer", "mine-counter"]) {
+    assert.equal(await page.locator(`#${id} .seg.on`).first().evaluate((el) =>
+      getComputedStyle(el).backgroundColor), "rgb(192, 96, 255)");
+  }
+});
 
 test("desktop window fits the game and native controls work", { timeout: 60000 }, async (t) => {
   const env = { ...process.env };

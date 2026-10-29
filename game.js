@@ -428,11 +428,43 @@
     themeBtn.textContent = `${dark ? "☀️" : "🌙"} Theme`;
   }
 
+  function saveSettings() {
+    try {
+      localStorage.setItem("minesweeper-settings", JSON.stringify({
+        theme: document.body.dataset.theme === "dark" ? "dark" : "light",
+        counterColor: settingsCounterColor.value,
+      }));
+    } catch (error) {
+      console.error("Unable to save Minesweeper settings:", error);
+      messageEl.textContent = "Unable to save settings. They may reset when you reopen the app.";
+    }
+  }
+
+  function restoreSettings() {
+    try {
+      const saved = localStorage.getItem("minesweeper-settings");
+      if (saved === null) return;
+      const settings = JSON.parse(saved);
+      if (!settings || !["light", "dark"].includes(settings.theme) ||
+          ![...settingsCounterColor.options].some((option) => option.value === settings.counterColor)) {
+        throw new Error("Invalid saved theme or counter color");
+      }
+      setTheme(settings.theme === "dark");
+      settingsCounterColor.value = settings.counterColor;
+      document.body.dataset.counterColor = settings.counterColor;
+    } catch (error) {
+      console.error("Unable to restore Minesweeper settings:", error);
+      messageEl.textContent = "Unable to restore saved settings. Please choose them again.";
+    }
+  }
+
   themeBtn.addEventListener("click", () => {
     setTheme(document.body.dataset.theme !== "dark");
+    saveSettings();
   });
   settingsCounterColor.addEventListener("change", () => {
     document.body.dataset.counterColor = settingsCounterColor.value;
+    saveSettings();
   });
   document.getElementById("help-ok").addEventListener("click", hideHelp);
   document.getElementById("help-x").addEventListener("click", hideHelp);
@@ -478,4 +510,5 @@
   });
 
   newGame();
+  restoreSettings();
 })();

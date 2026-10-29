@@ -36,7 +36,10 @@ Click to reveal a tile; right-click or Command-click to flag it.
 Choose **Custom...** from Game for widths of 5-30, heights of 5-24, and at least
 5 mines. The maximum mine count is the number of cells minus 9 to protect the
 first click and its neighbours. Use **R** to restart and **H** for Help.
-Theme switches between classic and dark palettes. The message box displays
+Theme switches between classic and dark palettes. Settings lets you choose red
+(default), blue, green, yellow or purple for the timer and mine counter.
+Your theme and counter color are saved automatically and restored when you reopen
+the app. The message box displays
 your time after completing a board.
 
 ## Development
