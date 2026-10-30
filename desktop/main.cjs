@@ -67,6 +67,9 @@ app.whenReady().then(() => {
       sandbox: true
     }
   });
+  const notifyDeactivate = () => gameWindow.webContents.send("window:deactivate");
+  gameWindow.on("blur", notifyDeactivate);
+  gameWindow.on("minimize", notifyDeactivate);
   gameWindow.setMenu(null);
   gameWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   gameWindow.webContents.on("will-navigate", (event) => event.preventDefault());

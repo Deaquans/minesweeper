@@ -230,6 +230,7 @@ select {
 }
 
 .game {
+  position: relative;
   padding: 8px;
   border: var(--bevel) solid;
   border-color: var(--light) var(--shadow) var(--shadow) var(--light);
@@ -424,6 +425,13 @@ select {
 .dialog-body li { margin-bottom: 4px; }
 .dialog-actions { display: flex; justify-content: center; }
 .dialog-actions .bevel-btn { min-width: 75px; }
+
+.pause-overlay {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.pause-overlay .dialog-body { text-align: center; }
+.pause-overlay .dialog-body p { margin-bottom: 12px; }
 
 .settings-option {
   display: flex;

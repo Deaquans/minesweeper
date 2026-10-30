@@ -22,7 +22,13 @@ Windows 10 and older are not supported targets.
 
 **Right-click** or **Command-click** to flag tile.\
 **R** to restart game.\
-**H** to open help button.
+**H** to open help button.\
+**P** to pause or resume in any difficulty.
+
+Games pause automatically when switching apps or minimizing. Press **P** or
+select **Resume** in the pause popup to continue.
+Opening Help or Settings stops the timer until the menu is closed. Games that
+are already paused remain paused.
 
 ## Files
 

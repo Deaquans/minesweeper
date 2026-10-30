@@ -252,3 +252,119 @@ test("desktop window fits the game and native controls work", { timeout: 60000 }
   });
   assert.equal(await exited, 0);
 });
+
+test("all difficulties pause with P, on focus loss and on minimizing", { timeout: 60000 }, async (t) => {
+  const userData = await mkdtemp(path.join(os.tmpdir(), "minesweeper-pause-"));
+  const env = { ...process.env };
+  delete env.ELECTRON_RUN_AS_NODE;
+  const executablePath = process.env.MINESWEEPER_EXECUTABLE;
+  const app = await electron.launch({
+    executablePath,
+    args: [...(executablePath ? [] : [path.join(__dirname, "..")]), `--user-data-dir=${userData}`],
+    env
+  });
+  t.after(async () => {
+    await app.close();
+    await rm(userData, { recursive: true, force: true });
+  });
+  const page = await app.firstWindow();
+  await page.waitForSelector(".cell");
+
+  assert.equal(await page.locator("#btn-pause").count(), 0);
+  for (const mode of ["beginner", "intermediate", "expert"]) {
+    await page.locator("#difficulty").selectOption(mode);
+    await page.locator("#reset").click();
+    await page.keyboard.press("p");
+    assert.equal(await page.locator("#pause-overlay").isVisible(), false);
+    await page.locator(".cell").first().click();
+    assert.equal(await page.locator("#pause-overlay").isVisible(), false, `${mode}: starting game`);
+    await page.waitForFunction(() =>
+      document.querySelector("#timer").getAttribute("aria-label") !== "Time: 000");
+
+    await page.keyboard.press("p");
+    assert.equal(await page.locator("#pause-overlay").isVisible(), true);
+    const pausedTime = await page.locator("#timer").getAttribute("aria-label");
+    await page.waitForTimeout(1200);
+    assert.equal(await page.locator("#timer").getAttribute("aria-label"), pausedTime);
+    const revealedWhilePaused = await page.locator(".cell.revealed").count();
+    await page.locator(".cell:not(.revealed)").first().evaluate((cell) => cell.click());
+    assert.equal(await page.locator(".cell.revealed").count(), revealedWhilePaused);
+
+    await page.keyboard.press("p");
+    assert.equal(await page.locator("#pause-overlay").isVisible(), false);
+    const resumedTime = await page.locator("#timer").getAttribute("aria-label");
+    await page.waitForFunction((previous) =>
+      document.querySelector("#timer").getAttribute("aria-label") !== previous,
+    resumedTime, { timeout: 3000 });
+
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event("blur"));
+      window.dispatchEvent(new Event("blur"));
+      window.dispatchEvent(new Event("focus"));
+    });
+    assert.equal(await page.locator("#pause-overlay").isVisible(), true);
+    await page.locator("#pause-resume").click();
+    assert.equal(await page.locator("#pause-overlay").isVisible(), false);
+  }
+
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].minimize());
+  await page.waitForFunction(() => !document.querySelector("#pause-overlay").hidden);
+  assert.equal(await page.locator("#pause-overlay").getAttribute("hidden"), null);
+  const minimizedTime = await page.locator("#timer").getAttribute("aria-label");
+  await page.waitForTimeout(1200);
+  assert.equal(await page.locator("#timer").getAttribute("aria-label"), minimizedTime);
+  await app.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows()[0];
+    window.restore();
+    window.focus();
+  });
+  await page.waitForFunction(() => !document.hidden);
+  assert.equal(await page.locator("#pause-overlay").isVisible(), true);
+  await page.locator("#pause-resume").click();
+  assert.equal(await page.locator("#pause-overlay").isVisible(), false);
+});
+
+test("Help and Settings suspend the timer without clearing existing pauses", { timeout: 60000 }, async (t) => {
+  const userData = await mkdtemp(path.join(os.tmpdir(), "minesweeper-menu-timer-"));
+  const env = { ...process.env };
+  delete env.ELECTRON_RUN_AS_NODE;
+  const executablePath = process.env.MINESWEEPER_EXECUTABLE;
+  const app = await electron.launch({
+    executablePath,
+    args: [...(executablePath ? [] : [path.join(__dirname, "..")]), `--user-data-dir=${userData}`],
+    env
+  });
+  t.after(async () => {
+    await app.close();
+    await rm(userData, { recursive: true, force: true });
+  });
+  const page = await app.firstWindow();
+  await page.waitForSelector(".cell");
+  for (const mode of ["beginner", "intermediate", "expert"]) {
+    await page.locator("#difficulty").selectOption(mode);
+    await page.locator(".cell").first().click();
+    for (const menu of ["help", "settings"]) {
+      await page.locator(`#btn-${menu}`).click();
+      const menuTime = await page.locator("#timer").getAttribute("aria-label");
+      await page.waitForTimeout(1200);
+      assert.equal(await page.locator("#timer").getAttribute("aria-label"), menuTime);
+      await page.locator(`#${menu}-ok`).click();
+      assert.equal(await page.locator("#pause-overlay").isVisible(), false);
+      await page.waitForFunction((previous) =>
+        document.querySelector("#timer").getAttribute("aria-label") !== previous,
+      menuTime, { timeout: 3000 });
+
+      await page.keyboard.press("p");
+      await page.locator(`#btn-${menu}`).click();
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator("#pause-overlay").isVisible(), true);
+      await page.locator("#pause-resume").click();
+
+      await page.locator(`#btn-${menu}`).click();
+      await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+      await page.locator(`#${menu}-x`).click();
+      assert.equal(await page.locator("#pause-overlay").isVisible(), true);
+      await page.locator("#pause-resume").click();
+    }
+  }
+});

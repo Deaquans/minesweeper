@@ -22,6 +22,8 @@
   const settingsOverlay = document.getElementById("settings-overlay");
   const settingsCounterColor = document.getElementById("settings-counter-color");
   const themeBtn = document.getElementById("btn-theme");
+  const pauseOverlay = document.getElementById("pause-overlay");
+  const pauseResumeBtn = document.getElementById("pause-resume");
   const native = window.nativeWindow;
 
   if (native) {
@@ -36,6 +38,7 @@
   }
 
   let config, cells, state, flagsPlaced, revealedCount, timerId, seconds;
+  let timerElapsedMs = 0, timerStartedAt = null;
 
   const SEGMENTS = {
     0: "abcdef", 1: "bc", 2: "abdeg", 3: "abcdg", 4: "bcfg",
@@ -74,14 +77,17 @@
 
   function newGame() {
     config = DIFFICULTIES[difficultyEl.value];
-    state = "ready"; // ready | playing | won | lost
+    state = "ready"; // ready | playing | paused | won | lost
     flagsPlaced = 0;
     revealedCount = 0;
     stopTimer();
     seconds = 0;
+    timerElapsedMs = 0;
+    timerStartedAt = null;
     setCounter(timerEl, 0);
     resetBtn.textContent = "🙂";
     messageEl.textContent = "";
+    pauseOverlay.hidden = true;
 
     cells = [];
     boardEl.replaceChildren();
@@ -225,8 +231,10 @@
   }
 
   function startTimer() {
+    if (timerId !== null || !helpOverlay.hidden || !settingsOverlay.hidden) return;
+    timerStartedAt = Date.now();
     timerId = setInterval(() => {
-      seconds++;
+      seconds = Math.floor((timerElapsedMs + Date.now() - timerStartedAt) / 1000);
       setCounter(timerEl, seconds);
     }, 1000);
   }
@@ -234,7 +242,44 @@
   function stopTimer() {
     clearInterval(timerId);
     timerId = null;
+    if (timerStartedAt !== null) {
+      timerElapsedMs += Date.now() - timerStartedAt;
+      timerStartedAt = null;
+      seconds = Math.floor(timerElapsedMs / 1000);
+      setCounter(timerEl, seconds);
+    }
   }
+
+  function pauseGame(focusResume = true) {
+    if (state !== "playing") return;
+    state = "paused";
+    stopTimer();
+    pauseOverlay.hidden = false;
+    if (focusResume) pauseResumeBtn.focus();
+  }
+
+  function resumeGame() {
+    if (state !== "paused") return;
+    state = "playing";
+    pauseOverlay.hidden = true;
+    startTimer();
+    resetBtn.focus();
+  }
+
+  function togglePause() {
+    if (state === "paused") resumeGame();
+    else pauseGame();
+  }
+
+  function pauseOnDeactivate() {
+    if (state === "playing") pauseGame(false);
+  }
+
+  window.addEventListener("blur", pauseOnDeactivate);
+  if (native) native.onDeactivate(pauseOnDeactivate);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseOnDeactivate();
+  });
 
   function lose(exploded) {
     state = "lost";
@@ -275,7 +320,7 @@
   }
 
   function handlePrimary(cell) {
-    if (state === "won" || state === "lost") return;
+    if (state === "paused" || state === "won" || state === "lost") return;
     if (cell.revealed) return chord(cell);
     if (cell.flagged) return;
     if (state === "ready") {
@@ -287,7 +332,7 @@
   }
 
   function handleSecondary(cell) {
-    if (state === "won" || state === "lost") return;
+    if (state === "paused" || state === "won" || state === "lost") return;
     toggleFlag(cell);
   }
 
@@ -321,6 +366,7 @@
   resetBtn.addEventListener("click", newGame);
 
   difficultyEl.addEventListener("change", newGame);
+  pauseResumeBtn.addEventListener("click", resumeGame);
 
   // ---- Window controls ----
   function closeWindow() {
@@ -336,6 +382,7 @@
   }
 
   function minimizeWindow() {
+    pauseOnDeactivate();
     if (native?.minimize) return native.minimize();
     windowEl.hidden = true;
     taskbarEl.hidden = false;
@@ -371,12 +418,14 @@
 
   // ---- Help dialog ----
   function showHelp() {
+    if (state === "playing") stopTimer();
     helpOverlay.hidden = false;
     document.getElementById("help-ok").focus();
   }
 
   function hideHelp() {
     helpOverlay.hidden = true;
+    if (state === "playing") startTimer();
   }
 
   document.getElementById("btn-help").addEventListener("click", showHelp);
@@ -432,12 +481,14 @@
   });
 
   function showSettings() {
+    if (state === "playing") stopTimer();
     settingsOverlay.hidden = false;
     settingsCounterColor.focus();
   }
 
   function hideSettings() {
     settingsOverlay.hidden = true;
+    if (state === "playing") startTimer();
     document.getElementById("btn-settings").focus();
   }
 
@@ -449,7 +500,7 @@
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.metaKey || e.ctrlKey || windowEl.hidden) return;
+    if (e.metaKey || e.ctrlKey || e.repeat || windowEl.hidden) return;
     if (!helpOverlay.hidden) {
       if (e.key === "Escape") hideHelp();
       return;
@@ -462,6 +513,7 @@
     const key = e.key.toLowerCase();
     if (key === "r") newGame();
     if (key === "h" || key === "?") showHelp();
+    if (key === "p") togglePause();
   });
 
   newGame();

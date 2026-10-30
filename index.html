@@ -40,6 +40,20 @@
           <div class="counter" id="timer" title="Time" aria-label="Time"></div>
         </div>
         <div id="board" class="board" role="grid" aria-label="Minesweeper board"></div>
+        <div id="pause-overlay" class="dialog-overlay pause-overlay" hidden>
+          <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+            <div class="title-bar">
+              <span class="title" id="pause-title">Game Paused</span>
+            </div>
+            <div class="dialog-body">
+              <p>The game is paused.</p>
+              <p>Press <kbd>P</kbd> or select Resume to continue.</p>
+              <div class="dialog-actions">
+                <button id="pause-resume" class="bevel-btn" type="button">▶ Resume</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="status-line">
@@ -90,7 +104,9 @@
               <li><b>Right-click</b>, <b>Ctrl-click</b> or <b>⌘-click</b> to place a flag.</li>
               <li><b>Click a number</b> with the right flags around it to reveal its neighbours.</li>
               <li>Choose <b>Beginner</b>, <b>Intermediate</b> or <b>Expert</b> from Game.</li>
-              <li><b>🙂</b> or <kbd>R</kbd>: new game · <kbd>H</kbd>: help</li>
+              <li><b>🙂</b> or <kbd>R</kbd>: new game</li>
+              <li><kbd>H</kbd>: opens this help box</li>
+              <li><kbd>P</kbd>: pause or resume game. Switching apps or minimizing pauses automatically.</li>
             </ul>
             <div class="dialog-actions">
               <button id="help-ok" class="bevel-btn" type="button">OK</button>
